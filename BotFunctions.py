@@ -26,10 +26,29 @@ bright_white = "\033[0;97m"
 
 token = "ODgyMDM4Njk2OTA2NDY1MzEw.YS1kjA.Dwiz3G1T60gqDqAoWfKpUXMrKKM"
 
+def getUser(userID):
+	print("This is where we would call the api to get user")
+	#   function GetUser(){
+	#   param($userID)
+	#   	$MyObject = (Invoke-WebRequest -Uri "https://indy-gaming-league-api.herokuapp.com/api/users/$userID" `
+	#   	-Method "POST" `
+	#   	-Headers @{
+	#   	"Accept"="application/json, text/plain, */*"
+	#   	"Origin"="https://www.indygamingleague.com"
+	#   	"Referer"="https://www.indygamingleague.com/"
+	#   	} `
+	#   	-ContentType "application/json;charset=UTF-8" `
+	#   	-Body "{}").Content | ConvertFrom-Json 
+	#   	return $MyObject
+	#   }
+
 def getPlayerName():
 	data = getActivePlayers()
-	
-	return data
+	myString = ""
+	for n in data['franchise']['playerIds']:
+		getUser(n["_id"])
+		myString += n["userName"] + " " + n["_id"] + "\n"
+	return myString
 
 def getActivePlayers():
 	host = "indy-gaming-league-api.herokuapp.com"
