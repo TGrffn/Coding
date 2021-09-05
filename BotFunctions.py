@@ -24,7 +24,7 @@ bright_cyan = "\033[0;96m"
 bright_white = "\033[0;97m"
 
 
-token = "ODgyMDM4Njk2OTA2NDY1MzEw.YS1kjA.Dwiz3G1T60gqDqAoWfKpUXMrKKM"
+token = "ODgyMDM4Njk2OTA2NDY1MzEw.YS1kjA.OpyCKiuBOHatcVolwjoGCJkrt6c"
 
 def getUser(userID):
 	print("This is where we would call the api to get user")
