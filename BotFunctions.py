@@ -35,7 +35,7 @@ def getUser(userID):
 	#   	-Headers @{
 	#   	"Accept"="application/json, text/plain, */*"
 	#   	"Origin"="https://www.indygamingleague.com"
-	#   	"Referer"="https://www.indygamingleague.com/"
+	#   	"Referer"="https://www.indygamingleague.com/"6
 	#   	} `
 	#   	-ContentType "application/json;charset=UTF-8" `
 	#   	-Body "{}").Content | ConvertFrom-Json 
@@ -64,7 +64,7 @@ def getActiveTeams():
 	mystring = ""
 	for team in values:
 		if team['active']:
-			mystring += team['formattedName'] + "\n"
+			mystring += team['formattedName'] + " " + team['_id'] + "\n"
 	return mystring
 
 
