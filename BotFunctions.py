@@ -1,9 +1,11 @@
+from discord import member
 import requests
 import re
 import ipdb
 import pprint
 import json
 import discord
+from discord.ext import commands
 
 
 black = "\033[0;30m"
@@ -24,7 +26,7 @@ bright_cyan = "\033[0;96m"
 bright_white = "\033[0;97m"
 
 
-token = "ODgyMDM4Njk2OTA2NDY1MzEw.YS1kjA.Dwiz3G1T60gqDqAoWfKpUXMrKKM"
+token = "ODgyMDM4Njk2OTA2NDY1MzEw.YS1kjA.OpyCKiuBOHatcVolwjoGCJkrt6c"
 
 def getUser(userID):
 	print("This is where we would call the api to get user")
@@ -42,15 +44,18 @@ def getUser(userID):
 	#   	return $MyObject
 	#   }
 
+def getTeamStat():
+	pass
+
 def getPlayerName():
-	data = getActivePlayers()
+	data = getActiveInfo()
 	myString = ""
 	for n in data['franchise']['playerIds']:
 		getUser(n["_id"])
 		myString += n["userName"] + " " + n["_id"] + "\n"
 	return myString
 
-def getActivePlayers():
+def getActiveInfo():
 	host = "indy-gaming-league-api.herokuapp.com"
 	s = requests.Session()
 	val = s.get('https://' + host + '/api/franchises/' + '5fe0e1c7bce2ac0015404ffc')
@@ -103,9 +108,22 @@ async def on_message(message):
 	if content.startswith('!playerlist'):
 		await message.channel.send(getPlayerName())
 
+
+client  = commands.Bot(command_prefix='!')
+
+@client.command()
+async def test(ctx, arg):
+	await ctx.send(arg)
+
+@client.command()
+async def kick(ctx, member : discord.Member, *, reason=None):
+	await member.kick(reason=reason)
+
+@client.command()
+async def ban(ctx, member : discord.Member, *, reason=None):
+	await member.ban(reason=reason)
+
 client.run(token)
-
-
 
 def main():
 	#ipdb.set_trace()
