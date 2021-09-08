@@ -112,8 +112,15 @@ async def on_message(message):
 client  = commands.Bot(command_prefix='!')
 
 @client.command()
-async def test(ctx, arg):
-	await ctx.send(arg)
+async def teamstat(ctx, *, arg):
+	team = getActiveInfo()
+	name = arg
+	myString = ""
+	for n in team['franchise']['teams']:
+		if n['active']:
+			if name == n['formattedName']:
+				myString += n['_id'] + "\n"
+	await ctx.send(myString)
 
 @client.command()
 async def kick(ctx, member : discord.Member, *, reason=None):
@@ -122,6 +129,19 @@ async def kick(ctx, member : discord.Member, *, reason=None):
 @client.command()
 async def ban(ctx, member : discord.Member, *, reason=None):
 	await member.ban(reason=reason)
+
+@client.command()
+async def invites(ctx, usr: discord.Member=None):
+    if usr == None:
+       user = ctx.author
+    else:
+       user = usr
+    total_invites = 0
+    for i in await ctx.guild.invites():
+        if i.inviter == user:
+            total_invites += i.uses
+    await ctx.send(f"{user.name} has invited {total_invites} member{'' if total_invites == 1 else 's'}!")
+
 
 client.run(token)
 
