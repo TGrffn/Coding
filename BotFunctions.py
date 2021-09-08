@@ -113,13 +113,19 @@ client  = commands.Bot(command_prefix='!')
 
 @client.command()
 async def teamstat(ctx, *, arg):
-	team = getActiveInfo()
+	tname = getActiveInfo()
 	name = arg
 	myString = ""
-	for n in team['franchise']['teams']:
+	for n in tname['franchise']['teams']:
 		if n['active']:
 			if name == n['formattedName']:
 				myString += n['_id'] + "\n"
+	#host = "indy-gaming-league-api.herokuapp.com"
+	#s = requests.Session()
+	#val = s.get('https://' + host + '/api/teams/' + myString)
+	#data = json.loads(val.text)
+	#for i in data['team']['players']:
+		#info = i["userName"] + " " + i["id"] + "\n"
 	await ctx.send(myString)
 
 @client.command()
