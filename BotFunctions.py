@@ -27,9 +27,14 @@ bright_white = "\033[0;97m"
 
 
 token = "ODgyMDM4Njk2OTA2NDY1MzEw.YS1kjA.OpyCKiuBOHatcVolwjoGCJkrt6c"
+host = "indy-gaming-league-api.herokuapp.com"
 
 def getUser(userID):
-	print("This is where we would call the api to get user")
+	uid = userID
+	s = requests.Session()
+	val = s.post('https://' + host + '/api/users/' + uid, data = '{}')
+	data = json.loads(val.text)
+	
 	#   function GetUser(){
 	#   param($userID)
 	#   	$MyObject = (Invoke-WebRequest -Uri "https://indy-gaming-league-api.herokuapp.com/api/users/$userID" `
@@ -56,7 +61,6 @@ def getPlayerName():
 	return myString
 
 def getActiveInfo():
-	host = "indy-gaming-league-api.herokuapp.com"
 	s = requests.Session()
 	val = s.get('https://' + host + '/api/franchises/' + '5fe0e1c7bce2ac0015404ffc')
 	data = json.loads(val.text)
@@ -76,7 +80,7 @@ def getActiveTeams():
 def getFranchiseTeams(franchiseID):
 	#ipdb.set_trace()
 	print("Attempting to do magic on " + franchiseID)
-	host = "indy-gaming-league-api.herokuapp.com"
+
 	s = requests.Session()
 	#value = s.get('https://' + host + '/api/franchises/5fe0e1c7bce2ac0015404ffc', verify=False)
 	#value = s.get('https://' + host + '/api/franchises/' + franchiseID, verify=False)
@@ -88,6 +92,33 @@ def getFranchiseTeams(franchiseID):
 
 client = discord.Client()
 
+def getTeam(teamID):
+	s = requests.Session()
+	val = s.get('https://' + host + '/api/teams/' + teamID)
+	data = json.loads(val.text)
+	info = ""
+	for i in data['team']['players']:
+		info += i["userName"] + " " + i["id"] + "\n"
+	return info
+
+def teamstat(cattle):
+	tname = getActiveInfo()
+	name = cattle
+	myString = ""
+	for n in tname['franchise']['teams']:
+		if n['active']:
+			if n['__v'] > 0:
+				if name == n['formattedName'].lower():
+					myString += n['_id']
+					break
+	info = getTeam(myString)
+	return info
+		
+	
+
+def tokenize_command(command):
+	return command.lower().split(maxsplit=1)
+
 @client.event
 async def on_ready():
 	print('We have logged in as {0.user}'.format(client))
@@ -98,8 +129,12 @@ async def on_message(message):
 		return
 
 	content = message.content
+	tokenized = tokenize_command(content)
 
-	if content.startswith('!teams'):
+	if tokenized[0] == "!teamstat" and len(tokenized[1]):
+		info = teamstat(tokenized[1])
+		await message.channel.send(info)
+	if tokenized[0] == '!teams':
 		await message.channel.send(getActiveTeams())
 	if content.startswith('!stats'):
 		await message.channel.send("Initializing stat request")
@@ -109,62 +144,52 @@ async def on_message(message):
 		await message.channel.send(getPlayerName())
 
 
-client  = commands.Bot(command_prefix='!')
-
-@client.command()
-async def teamstat(ctx, *, arg):
-	tname = getActiveInfo()
-	name = arg
-	myString = ""
-	for n in tname['franchise']['teams']:
-		if n['active']:
-			if name == n['formattedName']:
-				myString += n['_id'] + "\n"
-	#host = "indy-gaming-league-api.herokuapp.com"
-	#s = requests.Session()
-	#val = s.get('https://' + host + '/api/teams/' + myString)
-	#data = json.loads(val.text)
-	#for i in data['team']['players']:
-		#info = i["userName"] + " " + i["id"] + "\n"
-	await ctx.send(myString)
-
-@client.command()
-async def kick(ctx, member : discord.Member, *, reason=None):
-	await member.kick(reason=reason)
-
-@client.command()
-async def ban(ctx, member : discord.Member, *, reason=None):
-	await member.ban(reason=reason)
-
-@client.command()
-async def invites(ctx, usr: discord.Member=None):
-    if usr == None:
-       user = ctx.author
-    else:
-       user = usr
-    total_invites = 0
-    for i in await ctx.guild.invites():
-        if i.inviter == user:
-            total_invites += i.uses
-    await ctx.send(f"{user.name} has invited {total_invites} member{'' if total_invites == 1 else 's'}!")
+#client  = commands.Bot(command_prefix='!')
 
 
+# @client.command()
+# async def teamstat(ctx, *, arg):
+# 	await ctx.send(shiftystat(arg))
+
+# @client.command()
+# async def kick(ctx, member : discord.Member, *, reason=None):
+# 	await member.kick(reason=reason)
+
+# @client.command()
+# async def ban(ctx, member : discord.Member, *, reason=None):
+# 	await member.ban(reason=reason)
+
+# @client.command()
+# async def invites(ctx, usr: discord.Member=None):
+#     if usr == None:
+#        user = ctx.author
+#     else:
+#        user = usr
+#     total_invites = 0
+#     for i in await ctx.guild.invites():
+#         if i.inviter == user:
+#             total_invites += i.uses
+#     await ctx.send(f"{user.name} has invited {total_invites} member{'' if total_invites == 1 else 's'}!")
+
+
+
+# def main():
+# 	#ipdb.set_trace()
+# 	shifty = getUser('5fe033b3bce2ac0015402e50')
+# 	teams = getFranchiseTeams('5fe0e1c7bce2ac0015404ffc')
+# 	#pp = pprint.PrettyPrinter(indent=2)
+# 	for team in teams:
+# 		#pp.pprint(fucker)
+# 		active = team['active']
+# 		teamName = team['formattedName']
+# 		teamID = team['_id']
+
+# 		if active:
+# 			print(f"{white}Team Name: {teamName} Team ID: {teamID}")
+# 		else:
+# 			print(red + teamName)
+
+# main()
 client.run(token)
-
-def main():
-	#ipdb.set_trace()
-	teams = getFranchiseTeams('5fe0e1c7bce2ac0015404ffc')
-	#pp = pprint.PrettyPrinter(indent=2)
-	for team in teams:
-		#pp.pprint(fucker)
-		active = team['active']
-		teamName = team['formattedName']
-		teamID = team['_id']
-
-		if active:
-			print(f"{white}Team Name: {teamName} Team ID: {teamID}")
-		else:
-			print(red + teamName)
-
 #if __name__ == "__main__":
  #   main()
