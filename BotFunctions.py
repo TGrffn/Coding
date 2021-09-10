@@ -34,31 +34,21 @@ def getUser(userID):
 	s = requests.Session()
 	val = s.post('https://' + host + '/api/users/' + uid, data = '{}')
 	data = json.loads(val.text)
-	
-	#   function GetUser(){
-	#   param($userID)
-	#   	$MyObject = (Invoke-WebRequest -Uri "https://indy-gaming-league-api.herokuapp.com/api/users/$userID" `
-	#   	-Method "POST" `
-	#   	-Headers @{
-	#   	"Accept"="application/json, text/plain, */*"
-	#   	"Origin"="https://www.indygamingleague.com"
-	#   	"Referer"="https://www.indygamingleague.com/"6
-	#   	} `
-	#   	-ContentType "application/json;charset=UTF-8" `
-	#   	-Body "{}").Content | ConvertFrom-Json 
-	#   	return $MyObject
-	#   }
+	username = data['user']['userName']
+	discordId = data['user']['discordInfo']
+	tracker = data['user']['rocketLeagueVerifications'][0]
+	profile = username + "\n" + discordId + "\n" + tracker
+	return profile
 
-def getTeamStat():
-	pass
-
-def getPlayerName():
+def getPlayerName(id):
 	data = getActiveInfo()
-	myString = ""
+	name = id
+	playerlist = ""
 	for n in data['franchise']['playerIds']:
-		getUser(n["_id"])
-		myString += n["userName"] + " " + n["_id"] + "\n"
-	return myString
+		if name == n["userName"].lower():
+			playerlist += n["_id"]
+	profiles = getUser(playerlist)
+	return profiles
 
 def getActiveInfo():
 	s = requests.Session()
@@ -80,10 +70,7 @@ def getActiveTeams():
 def getFranchiseTeams(franchiseID):
 	#ipdb.set_trace()
 	print("Attempting to do magic on " + franchiseID)
-
 	s = requests.Session()
-	#value = s.get('https://' + host + '/api/franchises/5fe0e1c7bce2ac0015404ffc', verify=False)
-	#value = s.get('https://' + host + '/api/franchises/' + franchiseID, verify=False)
 	value = s.get('https://' + host + '/api/franchises/' + franchiseID)
 	object = json.loads(value.text)
 	return object['franchise']['teams']
@@ -101,9 +88,9 @@ def getTeam(teamID):
 		info += i["userName"] + " " + i["id"] + "\n"
 	return info
 
-def teamstat(cattle):
+def teamstat(stat):
 	tname = getActiveInfo()
-	name = cattle
+	name = stat
 	myString = ""
 	for n in tname['franchise']['teams']:
 		if n['active']:
@@ -134,12 +121,20 @@ async def on_message(message):
 	if tokenized[0] == "!teamstat" and len(tokenized[1]):
 		info = teamstat(tokenized[1])
 		await message.channel.send(info)
+
 	if tokenized[0] == '!teams':
 		await message.channel.send(getActiveTeams())
-	if content.startswith('!stats'):
-		await message.channel.send("Initializing stat request")
+
+	if tokenized[0] == "!playerstat" and len(tokenized[1]):
+		profile = getPlayerName(tokenized[1])
+		await message.channel.send(profile)
+
+	# if content.startswith('!stats'):
+	# 	await message.channel.send("Initializing stat request")
+	
 	if content.startswith('!rank'):
 		await message.channel.send("your rank is garbage.")
+	
 	if content.startswith('!playerlist'):
 		await message.channel.send(getPlayerName())
 
@@ -171,7 +166,7 @@ async def on_message(message):
 #             total_invites += i.uses
 #     await ctx.send(f"{user.name} has invited {total_invites} member{'' if total_invites == 1 else 's'}!")
 
-
+client.run(token)
 
 # def main():
 # 	#ipdb.set_trace()
@@ -190,6 +185,3 @@ async def on_message(message):
 # 			print(red + teamName)
 
 # main()
-client.run(token)
-#if __name__ == "__main__":
- #   main()
