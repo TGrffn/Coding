@@ -126,7 +126,7 @@ async def on_message(message):
 		for i in info['team']['players']:
 			pname += i["userName"] + "\n"
 		embed = discord.Embed(title="Team Info", description=info['team']['circuitName'], colour=0xe74c3c)
-		embed.set_author(name="SlothSqua", url="https://www.indygamingleague.com/franchises/5fe0e1c7bce2ac0015404ffc", icon_url="https://igl-franchise-logos.s3.amazonaws.com/5fe0e1c7bce2ac0015404ffc?AWSAccessKeyId=AKIATI2Y2CGJ5H32CKWW&Expires=1631324493&Signature=iTxexum%2F%2BxnufLJK5GspJWNDutI%3D")
+		embed.set_author(name="SlothSqua", url="https://www.indygamingleague.com/franchises/5fe0e1c7bce2ac0015404ffc", icon_url="https://pbs.twimg.com/profile_images/1397976693650886658/SJjDTS6N_400x400.jpg")
 		embed.add_field(name="Team Name:", value=info['team']['formattedName'], inline=False)
 		embed.add_field(name="Captain:", value=info['team']['captain']['userName'], inline=True)
 		embed.add_field(name="Players:", value=pname, inline=True)
@@ -135,17 +135,19 @@ async def on_message(message):
 	if tokenized[0] == '!teams':
 		i = getActiveTeams()
 		embed = discord.Embed(title="Active Team List:", description=i, colour=0x2ecc71)
+		embed.set_author(name="SlothSqua", url="https://www.indygamingleague.com/franchises/5fe0e1c7bce2ac0015404ffc", icon_url="https://pbs.twimg.com/profile_images/1397976693650886658/SJjDTS6N_400x400.jpg")
 		await message.channel.send(embed = embed)
 
 	if tokenized[0] == "!playerstat" and len(tokenized[1]):
 		profile = getPlayerName(tokenized[1])
 		link = profile['user']['rocketLeagueVerifications'][0]
-		link2 = profile['user']['rocketLeagueVerifications'][1]
+		# link2 = profile['user']['rocketLeagueVerifications'][1]
 		embed = discord.Embed(title="Player Profile", colour=0x87CEEB)
-		embed.set_author(name="SlothSqua", url="https://www.indygamingleague.com/franchises/5fe0e1c7bce2ac0015404ffc", icon_url="https://igl-franchise-logos.s3.amazonaws.com/5fe0e1c7bce2ac0015404ffc?AWSAccessKeyId=AKIATI2Y2CGJ5H32CKWW&Expires=1631324493&Signature=iTxexum%2F%2BxnufLJK5GspJWNDutI%3D")
+		embed.set_author(name="SlothSqua", url="https://www.indygamingleague.com/franchises/5fe0e1c7bce2ac0015404ffc", icon_url="https://pbs.twimg.com/profile_images/1397976693650886658/SJjDTS6N_400x400.jpg")
 		embed.add_field(name="Player Name:", value=profile['user']['userName'], inline=True)
 		embed.add_field(name="Discord:", value=profile['user']['discordInfo'],inline=True)
-		embed.add_field(name="Rocket League Tracker:", value=link+"\n"+link2, inline=False)
+		embed.add_field(name="Rocket League Tracker:", value=link, inline=False)
+		embed.set_thumbnail(url="https://wallpaperaccess.com/full/5089224.jpg")
 		await message.channel.send(embed=embed)
 
 	# if content.startswith('!stats'):
@@ -157,10 +159,14 @@ async def on_message(message):
 	
 	if content.startswith('!playerlist'):
 		await message.channel.send(getPlayerList())
+	
 
 
-#client  = commands.Bot(command_prefix='!')
+# client  = commands.Bot(command_prefix='!')
 
+# @client.command()
+# async def clear(ctx, amount = int):
+# 	await ctx.channel.purge(limit = amount)
 
 # @client.command()
 # async def teamstat(ctx, *, arg):
