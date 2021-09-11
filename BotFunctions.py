@@ -69,7 +69,7 @@ def getActiveTeams():
 	mystring = ""
 	for team in values:
 		if team['active']:
-			mystring += team['formattedName'] + "  " + team['_id'] + "\n"
+			mystring += team['formattedName'] + "\n"
 	return mystring
 
 
