@@ -1,4 +1,5 @@
-from discord import member
+from os import name
+from discord import colour, member
 import requests
 import re
 import ipdb
@@ -35,10 +36,6 @@ def getUser(userID):
 	val = s.post('https://' + host + '/api/users/' + uid, data = '{}')
 	data = json.loads(val.text)
 	profile = data
-	# username = data['user']['userName']
-	# discordId = data['user']['discordInfo']
-	# tracker = data['user']['rocketLeagueVerifications'][0]
-	# profile = username + discordId + tracker
 	return profile
 
 def getPlayerName(id):
@@ -72,7 +69,6 @@ def getActiveTeams():
 	mystring = ""
 	for team in values:
 		if team['active']:
-			# return team['formattedName']
 			mystring += team['formattedName'] + "  " + team['_id'] + "\n"
 	return mystring
 
@@ -91,11 +87,8 @@ client = discord.Client()
 def getTeam(teamID):
 	s = requests.Session()
 	val = s.get('https://' + host + '/api/teams/' + teamID)
-	data = json.loads(val.text)
-	info = ""
-	for i in data['team']['players']:
-		info += i["userName"] + " " + i["id"] + "\n"
-	return info
+	team = json.loads(val.text)
+	return team
 
 def teamstat(stat):
 	tname = getActiveInfo()
@@ -129,18 +122,30 @@ async def on_message(message):
 
 	if tokenized[0] == "!teamstat" and len(tokenized[1]):
 		info = teamstat(tokenized[1])
-		await message.channel.send(info)
+		pname = ""
+		for i in info['team']['players']:
+			pname += i["userName"] + "\n"
+		embed = discord.Embed(title="Team Info", description=info['team']['circuitName'], colour=0xe74c3c)
+		embed.set_author(name="SlothSqua", url="https://www.indygamingleague.com/franchises/5fe0e1c7bce2ac0015404ffc", icon_url="https://igl-franchise-logos.s3.amazonaws.com/5fe0e1c7bce2ac0015404ffc?AWSAccessKeyId=AKIATI2Y2CGJ5H32CKWW&Expires=1631324493&Signature=iTxexum%2F%2BxnufLJK5GspJWNDutI%3D")
+		embed.add_field(name="Team Name:", value=info['team']['formattedName'], inline=False)
+		embed.add_field(name="Captain:", value=info['team']['captain']['userName'], inline=True)
+		embed.add_field(name="Players:", value=pname, inline=True)
+		await message.channel.send(embed=embed)
 
 	if tokenized[0] == '!teams':
 		i = getActiveTeams()
-		embed = discord.Embed(title="Active Team List:", description=i, colour=0x87CEEB)
+		embed = discord.Embed(title="Active Team List:", description=i, colour=0x2ecc71)
 		await message.channel.send(embed = embed)
 
 	if tokenized[0] == "!playerstat" and len(tokenized[1]):
 		profile = getPlayerName(tokenized[1])
-		embed = discord.Embed(title="Player Profile", description="Info:", colour=0x87CEEB)
-		embed.set_author(name="SlothSqua", icon_url="https://igl-franchise-logos.s3.amazonaws.com/5fe0e1c7bce2ac0015404ffc?AWSAccessKeyId=AKIATI2Y2CGJ5H32CKWW&Expires=1631324493&Signature=iTxexum%2F%2BxnufLJK5GspJWNDutI%3D")
-		embed.add_field(name="Player Name:", value=profile[0])
+		link = profile['user']['rocketLeagueVerifications'][0]
+		link2 = profile['user']['rocketLeagueVerifications'][1]
+		embed = discord.Embed(title="Player Profile", colour=0x87CEEB)
+		embed.set_author(name="SlothSqua", url="https://www.indygamingleague.com/franchises/5fe0e1c7bce2ac0015404ffc", icon_url="https://igl-franchise-logos.s3.amazonaws.com/5fe0e1c7bce2ac0015404ffc?AWSAccessKeyId=AKIATI2Y2CGJ5H32CKWW&Expires=1631324493&Signature=iTxexum%2F%2BxnufLJK5GspJWNDutI%3D")
+		embed.add_field(name="Player Name:", value=profile['user']['userName'], inline=True)
+		embed.add_field(name="Discord:", value=profile['user']['discordInfo'],inline=True)
+		embed.add_field(name="Rocket League Tracker:", value=link+"\n"+link2, inline=False)
 		await message.channel.send(embed=embed)
 
 	# if content.startswith('!stats'):
