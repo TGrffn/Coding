@@ -34,10 +34,11 @@ def getUser(userID):
 	s = requests.Session()
 	val = s.post('https://' + host + '/api/users/' + uid, data = '{}')
 	data = json.loads(val.text)
-	username = data['user']['userName']
-	discordId = data['user']['discordInfo']
-	tracker = data['user']['rocketLeagueVerifications'][0]
-	profile = username + "\n" + discordId + "\n" + tracker
+	profile = data
+	# username = data['user']['userName']
+	# discordId = data['user']['discordInfo']
+	# tracker = data['user']['rocketLeagueVerifications'][0]
+	# profile = username + discordId + tracker
 	return profile
 
 def getPlayerName(id):
@@ -49,6 +50,14 @@ def getPlayerName(id):
 			playerlist += n["_id"]
 	profiles = getUser(playerlist)
 	return profiles
+
+def getPlayerList():
+	data = getActiveInfo()
+	players = ""
+	for i in data['franchise']['playerIds']:
+		players += i["userName"] + "\n"
+	return players
+
 
 def getActiveInfo():
 	s = requests.Session()
@@ -63,12 +72,12 @@ def getActiveTeams():
 	mystring = ""
 	for team in values:
 		if team['active']:
-			mystring += team['formattedName'] + " " + team['_id'] + "\n"
+			# return team['formattedName']
+			mystring += team['formattedName'] + "  " + team['_id'] + "\n"
 	return mystring
 
 
 def getFranchiseTeams(franchiseID):
-	#ipdb.set_trace()
 	print("Attempting to do magic on " + franchiseID)
 	s = requests.Session()
 	value = s.get('https://' + host + '/api/franchises/' + franchiseID)
@@ -123,20 +132,26 @@ async def on_message(message):
 		await message.channel.send(info)
 
 	if tokenized[0] == '!teams':
-		await message.channel.send(getActiveTeams())
+		i = getActiveTeams()
+		embed = discord.Embed(title="Active Team List:", description=i, colour=0x87CEEB)
+		await message.channel.send(embed = embed)
 
 	if tokenized[0] == "!playerstat" and len(tokenized[1]):
 		profile = getPlayerName(tokenized[1])
-		await message.channel.send(profile)
+		embed = discord.Embed(title="Player Profile", description="Info:", colour=0x87CEEB)
+		embed.set_author(name="SlothSqua", icon_url="https://igl-franchise-logos.s3.amazonaws.com/5fe0e1c7bce2ac0015404ffc?AWSAccessKeyId=AKIATI2Y2CGJ5H32CKWW&Expires=1631324493&Signature=iTxexum%2F%2BxnufLJK5GspJWNDutI%3D")
+		embed.add_field(name="Player Name:", value=profile[0])
+		await message.channel.send(embed=embed)
 
 	# if content.startswith('!stats'):
 	# 	await message.channel.send("Initializing stat request")
 	
 	if content.startswith('!rank'):
-		await message.channel.send("your rank is garbage.")
+		embed = discord.Embed(title="Hello, world!", description=":D", colour=0x87CEEB)
+		await message.channel.send(embed = embed)
 	
 	if content.startswith('!playerlist'):
-		await message.channel.send(getPlayerName())
+		await message.channel.send(getPlayerList())
 
 
 #client  = commands.Bot(command_prefix='!')
@@ -167,21 +182,3 @@ async def on_message(message):
 #     await ctx.send(f"{user.name} has invited {total_invites} member{'' if total_invites == 1 else 's'}!")
 
 client.run(token)
-
-# def main():
-# 	#ipdb.set_trace()
-# 	shifty = getUser('5fe033b3bce2ac0015402e50')
-# 	teams = getFranchiseTeams('5fe0e1c7bce2ac0015404ffc')
-# 	#pp = pprint.PrettyPrinter(indent=2)
-# 	for team in teams:
-# 		#pp.pprint(fucker)
-# 		active = team['active']
-# 		teamName = team['formattedName']
-# 		teamID = team['_id']
-
-# 		if active:
-# 			print(f"{white}Team Name: {teamName} Team ID: {teamID}")
-# 		else:
-# 			print(red + teamName)
-
-# main()
