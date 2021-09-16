@@ -193,3 +193,62 @@ async def on_message(message):
 #     await ctx.send(f"{user.name} has invited {total_invites} member{'' if total_invites == 1 else 's'}!")
 
 client.run(token)
+
+# # function Get-TrackerData(){
+# #     param([string]$ID, [Switch]$Steam, [Switch]$Epic, [switch]$Xbox, [switch]$Playstation, [switch]$Nintendo)
+# #     $endpoint = ""
+# #     if($Steam){
+# #         $endpoint = "steam/$ID"
+# #         #Example-Squishy: "steam/76561198286759507"  # "steam/SquishyMuffinz" # Does this work??  ## YES..
+# #     }
+# #     elseif($Epic){
+# #         $endpoint = "epic/$ID" # "epic/RealLethamyr" #force return leth  # "epic/sh1ftybit" (main epic account)  # "epic/shiftybit"(nintendo switch epic smurf) 
+# #     }
+# #     elseif($xbox){
+# #         $endpoint =  "xbl/$id" #"xbl/wolfbyt3" # returns my xbox account (linked to my epic so this is the same as my steam)
+# #     }
+# #     elseif($Playstation){
+# #         $endpoint = "psn/$id" # "psn/First-Killer-19" # returns firstkiller on playstation. 
+# #     }
+# #     elseif($Nintendo) { # $Switch is not a good var name, it's a keyword in many langs. I pick $Nintendo
+# #         $endpoint = "switch/$id"   # "switch/Nuqqet" # this is the #1 switch player on leaderboards
+# #     }
+# #     else{
+# #         Write-Error "Please specify platform. -Steam, -Epic, -Xbox, -Playstation, or -Nintendo"
+# #         return
+# #     }
+# #     $json = (curl "https://api.tracker.gg/api/v2/rocket-league/standard/profile/$endpoint").content
+# #     $data = ($json | ConvertFrom-Json).Data
+# #     return $data
+# # }
+# # function DetailView(){
+# #     param($in)
+# #     $playlists = $in.segments| ?{$_.type -eq "playlist"} 
+# #     foreach($playlist in $playlists){
+# #         $Percentile = 100 - $playlist.stats.rating.percentile
+# #         [PSCustomObject] @{
+# #             "Playlist" = $playlist.metadata.name;
+# #             #"Tier" = $playlist.stats.tier.value; #number. 0 is bronze 1, 3 is silver 1, 4 is silver 2, etc. 
+# #             "MMR" =  $playlist.stats.rating.value;
+# #             #"Rank" = $playlist.stats.tier.metadata.name;
+# #             "Rank" = "$($playlist.stats.tier.metadata.name) div $($playlist.stats.division.value)." #Friendly Rank 
+# #             #"Division" = $playlist.stats.division.metadata.name;
+# #             "SeasonMatches" = $playlist.stats.matchesPlayed.value;
+# #             "Percentile" = "top $Percentile%";
+
+# #         }
+# #     }
+# #     #$playlists | %{"$($_.metadata.name) - $($_.stats.tier.value) "} 
+# # }
+# # function overview(){
+# #     param($in)
+# #     $overview = $in.segments[0].stats
+# #     [PSCustomObject]@{
+# #         Wins = $overview.wins.value;
+# #         Goals = $overview.goals.value;
+# #         Shots = $overview.shots.value;
+# #         MVPs = $overview.mvps.value;
+# #         Saves = $overview.saves.value;
+# #         Assists = $overview.assists.value;
+# #     }
+# # }
