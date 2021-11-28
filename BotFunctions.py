@@ -69,7 +69,6 @@ def getFranchiseTeams(franchiseID):
 	object = json.loads(value.text)
 	return object['franchise']['teams']
 
-
 client = discord.Client()
 
 def getTeam(teamID):
@@ -136,14 +135,23 @@ async def on_message(message):
 		embed.add_field(name="Rocket League Tracker:", value=link, inline=False)
 		embed.set_thumbnail(url="https://wallpaperaccess.com/full/5089224.jpg")
 		await message.channel.send(embed=embed)
-	
+
+##	if tokenized[0] == "!prank" and len(tokenized[1]):
+##		response = tokenized[1]
+##		await message.channel.send(response)
+
+
 	if content.startswith('!rank'):
 		embed = discord.Embed(title="Hello, world!", description=":D", colour=0x87CEEB)
 		await message.channel.send(embed = embed)
 	
 	if content.startswith('!playerlist'):
 		await message.channel.send(getPlayerList())
-	
 
+bot = commands.Bot(command_prefix='!')
+
+@bot.command()
+async def prank(ctx, arg1, arg2):
+	await ctx.send(arg1)
 
 client.run(token)
