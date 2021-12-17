@@ -9,13 +9,55 @@ import discord
 from discord.ext import commands
 from configparser import ConfigParser
 
+print("Beginning our Journey")
+class PlayerOverview:
+	defaultIcon = "https://key0.cc/images/preview/11837_d71d5cb0a665b2d4e70ac7174e7929b5.png"
+	platformUserHandle = None
+	wins = None
+	goals = None
+	saves = None
+	shots = None
+	assists = None
+	tier = None
+	tierIconUrl = None
+	avatarUrl = None
+
+	def getIconUrl(self):
+		if(self.avatarUrl == None):
+			return self.defaultIcon
+		else:
+			return self.avatarUrl
+	
+	def __init__(self, data):
+		info = data
+		self.platformUserHandle = info['data']['platformInfo']['platformUserHandle']
+		self.wins = info['data']['segments'][0]['stats']['wins']['value']          
+		self.goals = info['data']['segments'][0]['stats']['goals']['value']          
+		self.saves = info['data']['segments'][0]['stats']['saves']['value']          
+		self.shots = info['data']['segments'][0]['stats']['shots']['value']          
+		self.assists = info['data']['segments'][0]['stats']['assists']['value']          
+		self.tier = info['data']['segments'][3]['stats']['tier']['metadata']['name']
+		self.tierIconUrl = info['data']['segments'][3]['stats']['tier']['metadata']['iconUrl']
+		self.avatarUrl = info['data']['platformInfo']['avatarUrl']
+
+	def MakeEmbed(self):
+		embed = discord.Embed(title="Player Overview:", colour=0xe74c3c)
+		embed.set_author(name=self.platformUserHandle, icon_url=self.getIconUrl())
+		embed.add_field(name="Wins:", value=self.wins, inline=True)
+		embed.add_field(name="Goals:", value=self.goals, inline=True)
+		embed.add_field(name="Saves:", value=self.saves, inline=True)
+		embed.add_field(name="Shots:", value=self.shots, inline=True)
+		embed.add_field(name="Assists:", value=self.assists, inline=True)
+		embed.add_field(name="3v3 Rank:", value=self.tier, inline=False)
+		embed.set_thumbnail (url=self.tierIconUrl)
+		return embed
 
 
 parser = ConfigParser()
 parser.read('SlothSteveToken.ini')
 
 token = parser.get('BotToken', 'token')
-		
+
 def rlStat(link):
 	endpoint = link
 	url = 'https://api.tracker.gg/api/v2/rocket-league/standard/profile/' + endpoint
@@ -31,7 +73,7 @@ def rlStat(link):
 client = discord.Client()
 
 def tokenize_command(command):
-	return command.lower().split(maxsplit=1)
+	return command.lower().split(maxsplit=2)
 
 @client.event
 async def on_ready():
@@ -48,34 +90,23 @@ async def on_message(message):
 	if tokenized[0] == "!rlstat" and len(tokenized[1]) and len(tokenized[2]):
 		platform = tokenized[1]
 		link = ""
+		userid = tokenized[2]
 		if platform == "steam":
-			link = "steam/" + tokenized[2]
+			link = "steam/" + userid
+		elif platform == "epic":
+			link = "epic/" + userid
+		elif platform == "xbox":
+			link = "xbl/" + userid
+		elif platform == "nintendo":
+			link = "switch/" + userid
+		elif platform == "playstation":
+			link == "psn/" + userid          
 		else:
-			if platform == "epic":
-				link = "epic/" + tokenized[2]
-			else:
-				if platform == "xbox":
-					link = "xbl/" + tokenized[2]
-				else:
-					if platform == "nintendo":
-						link = "switch/" + tokenized[2]
-					else:
-						if platform == "playstation":
-							link == "psn/" + tokenized[2]
-						else:
-							await message.channel.send("Please specify platform. steam, epic, xbox, playstation, or nintendo")
+			await message.channel.send("Please specify platform. steam, epic, xbox, playstation, or nintendo")
 
 		info = rlStat(link)
-		embed = discord.Embed(title="Player Overview:", colour=0xe74c3c)
-		embed.set_author     (name=info['data']['platformInfo']['platformUserHandle'], icon_url='https://key0.cc/images/preview/463_eb72c1e7f13edc624aa5f6372112e001.png')
-		embed.add_field      (name="Wins:",     value=info   ['data']['segments'][0]['stats']['wins']   ['value'],            inline=True)
-		embed.add_field      (name="Goals:",    value=info   ['data']['segments'][0]['stats']['goals']  ['value'],            inline=True)
-		embed.add_field      (name="Saves:",    value=info   ['data']['segments'][0]['stats']['saves']  ['value'],            inline=True)
-		embed.add_field      (name="Shots:",    value=info   ['data']['segments'][0]['stats']['shots']  ['value'],            inline=True)
-		embed.add_field      (name="Assists:",  value=info   ['data']['segments'][0]['stats']['assists']['value'],            inline=True)
-		embed.add_field      (name="3v3 Rank:", value=info   ['data']['segments'][3]['stats']['tier']   ['metadata']['name'], inline=False)
-		embed.set_thumbnail  (url=info['data']['segments'][3]['stats']['tier']['metadata']['iconUrl'])
+		overview = PlayerOverview(info)
+		embed = overview.MakeEmbed()
 		await message.channel.send(embed=embed)
-
 	
 client.run(token)
