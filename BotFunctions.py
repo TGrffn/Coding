@@ -108,5 +108,5 @@ async def on_message(message):
 		overview = PlayerOverview(info)
 		embed = overview.MakeEmbed()
 		await message.channel.send(embed=embed)
-	
+		
 client.run(token)
