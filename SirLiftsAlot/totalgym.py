@@ -1,8 +1,12 @@
 import discord
 import os
 from dotenv import load_dotenv
+import gspread
 
 load_dotenv()
+
+gc= gspread.service_account(filename='D:\Projects\Python\Coding\SirLiftsAlot\sirliftsalot-cb6e873ecd82.json')
+sh = gc.open("KnightsoftheKettlebell")
 
 client = discord.Client()
 intents = discord.Intents.all()
